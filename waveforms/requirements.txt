@@ -1,0 +1,17 @@
+panel
+holoviews
+numpy
+pandas
+numba>=0.43.1
+zstd
+tqdm
+dill
+psutil
+numexpr
+boto3
+scipy
+pymongo
+lz4
+immutabledict
+packaging
+strax

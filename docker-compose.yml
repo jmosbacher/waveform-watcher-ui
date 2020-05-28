@@ -1,0 +1,46 @@
+version: '3'
+
+volumes:
+  production_traefik: {}
+
+services:
+
+  waveforms:
+    build:
+        context: .
+        dockerfile: ./compose/production/waveforms/Dockerfile
+    image: waveforms_production_panels
+    container_name: waveforms_production_panels
+    expose:
+      - "5006"
+    networks:
+      - web
+    environment:
+      - DOMAIN=${DOMAIN}
+    restart: always
+    labels:
+      - "traefik.docker.network=web"
+      - "traefik.enable=true"
+      - "traefik.basic.frontend.rule=Host:waveforms.${DOMAIN}"
+      - "traefik.port=5006"
+      - "traefik.basic.protocol=http"
+
+  traefik:
+    build:
+      context: .
+      dockerfile: ./compose/production/traefik/Dockerfile
+    image: waveforms_production_traefik
+    container_name: waveforms_production_traefik_1
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+    networks:
+      - web
+    volumes:
+      - production_traefik:/etc/traefik/acme
+    # traefik needs the docker socket, to explore new container on your docker-host
+      - /var/run/docker.sock:/var/run/docker.sock
+    
+networks:
+  web:
+    external: true
